@@ -14,3 +14,11 @@ API REQUIREMENTS
 
 AUTHENTICATION REQUIREMENTS
 
+1) Return a JSON response for all APIs
+2) A user has an ID, full name, unique username, hashed password, usre active status and login attempts
+3) A user can log in on more than one device and should not log out a previous device (sessions)
+4) Create a new user using a URL of: /sessions
+5) Log in a user using a URL of: /sessions
+6) Log out a user using a URL of: /sessions/{:sessionid}
+7) Limited lifetime of a session access token, refreshed using a URL of: /sessions/{:sessionid}
+
