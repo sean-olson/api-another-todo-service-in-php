@@ -1,4 +1,4 @@
-These are the requirements for the TODO API
+API REQUIREMENTS
 
 1) Return a JSON response for all APIs and allow caching where appropriate.
 2) A task has the following properties: ID, title, description, deadline, date, completion status.
@@ -11,3 +11,6 @@ These are the requirements for the TODO API
 9) /tasks/{:taskid} => (PATCH) update the title, description, deadline date, or completion status  and return an updated
     task.
 10) /tasks => (POST) create a new task and return the details for the new task.
+
+AUTHENTICATION REQUIREMENTS
+
