@@ -47,6 +47,25 @@
             }
 
             echo json_encode($this->_responseData);
+        }
+    }
 
+
+    class ResponseGenerator {
+        public static  function newErrorResponse($httpStatusCode, $message){
+            $response = new Response();
+            $response->setHttpStatusCode($httpStatusCode);
+            $response->addMessage($message);
+            $response->setSuccess(false);
+            $response->toCache(false);
+            return $response;
+        }
+        public static  function newSuccessResponse($httpStatusCode, $message, $cache){
+            $response = new Response();
+            $response->setHttpStatusCode($httpStatusCode);
+            $response->addMessage($message);
+            $response->setSuccess(false);
+            $response->toCache($cache);
+            return $response;
         }
     }

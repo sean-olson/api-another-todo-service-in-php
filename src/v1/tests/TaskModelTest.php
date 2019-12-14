@@ -4,7 +4,7 @@ require_once('../model/Task.php');
 require_once('../model/Response.php');
 
 try{
-    $task = new Task(1, "Title here", "Description here", "01/01/2019 12:00", "N");
+    $task = new Task("1", "Title here", "Description here", "01/01/2019 12:00", "N");
 
     $response = new Response();
     $response->setHttpStatusCode(200);
