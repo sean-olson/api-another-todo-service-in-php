@@ -169,3 +169,55 @@ elseif (array_key_exists("completed", $_GET)){
         exit;
     }
 }
+elseif (empty($_GET)) {
+
+    if ($_SERVER['REQUEST_METHOD'] === 'GET'){}
+    elseif ($_SERVER['REQUEST_METHOD'] === 'POST'){}
+    else {
+        $errorResponse = ResponseGenerator::newErrorResponse(405, "HTTP method not supported.");
+        $errorResponse->send();
+        exit;
+    }
+
+    try {
+
+        $query = $readDB->prepare('SELECT id, title, description, DATE_FORMAT(deadline, "%d/%m/%Y %H:%i") as deadline, completed FROM tbltasks');
+        $query->execute();
+
+        $rowCount = $query->rowCount();
+
+        if ($rowCount === 0){
+            $errorResponse = ResponseGenerator::newErrorResponse(404, "No task with that id.");
+            $errorResponse->send();
+            exit;
+        }
+
+        while($row = $query->fetch(PDO::FETCH_ASSOC)) {
+            $task = new Task($row['id'], $row['title'], $row['description'], $row['deadline'], $row['completed']);
+            $taskArray[] = $task->returnTaskAsArray();
+        }
+
+        $returnData = array();
+        $returnData['rows_returned'] = $rowCount;
+        $returnData['tasks'] = $taskArray;
+
+        $successResponse = ResponseGenerator::newSuccessResponse(200, "", true);
+        $successResponse->setData($returnData);
+        $successResponse->send();
+
+    } catch (PDOException $ex) {
+        $errorResponse = ResponseGenerator::newErrorResponse(500, "Error: ".$ex->getMessage());
+        $errorResponse->send();
+        exit;
+
+    } catch (TaskException $ex) {
+        $errorResponse = ResponseGenerator::newErrorResponse(500, "Error: ".$ex->getMessage());
+        $errorResponse->send();
+        exit;
+    }
+}
+else {
+    $errorResponse = ResponseGenerator::newErrorResponse(404, "Resource not found.");
+    $errorResponse->send();
+    exit;
+}
