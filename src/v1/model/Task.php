@@ -19,6 +19,7 @@ class Task {
     private $_completedStatus;
 
     public function __construct($id, $title, $description, $deadline, $completedStatus) {
+
        $this->setId($id);
        $this->setTitle($title);
        $this->setDescription($description);
@@ -61,11 +62,18 @@ class Task {
         return $this->_deadline;
     }
     public function setDeadline($deadline) {
+
+        if($deadline === null) {
+            return;
+        }
+
         $deadlineDate = date_create_from_format('d/m/Y H:i', $deadline);
         $parsedDate = date_format($deadlineDate, 'd/m/Y H:i');
-        if($deadline !== null &&  $parsedDate != $deadline) {
-            throw new TaskException("Task deadline date-time error.");
+
+        if($parsedDate != $deadline) {
+            return;
         }
+
         $this->_deadline = $deadline;
     }
 

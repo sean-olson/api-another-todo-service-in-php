@@ -64,7 +64,7 @@
             $response = new Response();
             $response->setHttpStatusCode($httpStatusCode);
             $response->addMessage($message);
-            $response->setSuccess(false);
+            $response->setSuccess(true);
             $response->toCache($cache);
             return $response;
         }
