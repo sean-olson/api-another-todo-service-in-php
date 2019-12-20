@@ -302,7 +302,6 @@ elseif (empty($_GET)) {
                 exit;
             }
 
-
             if(!isset($jsonData->title) || !isset($jsonData->completed) ) {
                 $errorResponse = ResponseGenerator::newErrorResponse(400, "The task title and completed fields are required.");
                 $errorResponse->send();
@@ -316,7 +315,7 @@ elseif (empty($_GET)) {
             $deadline = $newTask->getDeadline();
             $completed = $newTask->getCompletedStatus();
 
-            $query = $writeDB->prepare('INSERT INTO tblTasks (title, description, deadline, completed) VALUES (:title, :description, STR_TO_DATE(:deadline, \'%d%m%Y %H:%i\'), :completed)');
+            $query = $writeDB->prepare('INSERT INTO tblTasks (title, description, deadline, completed) VALUES (:title, :description, :deadline, :completed)');
             $query->bindParam(':title', $title, PDO::PARAM_STR);
             $query->bindParam(':description', $description, PDO::PARAM_STR);
             $query->bindParam(':deadline', $deadline, PDO::PARAM_STR);
@@ -333,7 +332,7 @@ elseif (empty($_GET)) {
 
             $lastTaskId = $writeDB->lastInsertId();
 
-            $query_s = $writeDB->prepare('SELECT id, title, description, DATE_FORMAT(deadline, "%d/%m/%Y %H:%i") as deadline, completed FROM tbltasks WHERE id = :taskid');
+            $query_s = $writeDB->prepare('SELECT id, title, description, deadline, completed FROM tbltasks WHERE id = :taskid');
             $query_s->bindParam(':taskid', $lastTaskId, PDO::PARAM_INT);
             $query_s->execute();
 
@@ -347,6 +346,7 @@ elseif (empty($_GET)) {
 
             while($row = $query_s->fetch(PDO::FETCH_ASSOC)) {
                 $task = new Task($row['id'], $row['title'], $row['description'], $row['deadline'], $row['completed']);
+                $task->setShortDeadline();
                 $taskArray[] = $task->returnTaskAsArray();
             }
 

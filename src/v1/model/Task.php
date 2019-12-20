@@ -62,19 +62,17 @@ class Task {
         return $this->_deadline;
     }
     public function setDeadline($deadline) {
-
         if($deadline === null) {
+            $this->_deadline = null;
             return;
         }
-
-        $deadlineDate = date_create_from_format('d/m/Y H:i', $deadline);
-        $parsedDate = date_format($deadlineDate, 'd/m/Y H:i');
-
-        if($parsedDate != $deadline) {
+        $this->_deadline = date_format(new DateTime($deadline), 'Y-m-d H:i:s');
+    }
+    public function setShortDeadline() {
+        if($this->_deadline === null) {
             return;
         }
-
-        $this->_deadline = $deadline;
+        $this->_deadline = date_format(new DateTime($this->_deadline), 'd/m/Y');
     }
 
     public function getCompletedStatus() {
