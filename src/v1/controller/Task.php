@@ -3,6 +3,7 @@
 require_once('db.php');
 require_once('../model/Task.php');
 require_once('../model/Response.php');
+require_once ('./task_partials/_getTask.php');
 
 try {
     $writeDB = DB::connectWriteDB();
@@ -16,18 +17,155 @@ try {
 
 if(array_key_exists("taskid", $_GET)){
 
-    $taskid = $_GET['taskid'];
-
-    if ($taskid == '' || !is_numeric($taskid)){
-        $errorResponse = ResponseGenerator::newErrorResponse(400, "Task ID must be numeric value");
-        $errorResponse->send();
-        exit;
-    }
-    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $taskid = $_GET['taskid'];
+            getTask($taskid, $readDB);
+        }
+//
+//    if ($taskid == '' || !is_numeric($taskid)){
+//        $errorResponse = ResponseGenerator::newErrorResponse(400, "Task ID must be numeric value");
+//        $errorResponse->send();
+//        exit;
+//    }
+//    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+//
+//        try {
+//
+//            $query = $readDB->prepare('SELECT id, title, description, DATE_FORMAT(deadline, "%d/%m/%Y %H:%i") as deadline, completed FROM tbltasks WHERE id = :taskid');
+//            $query->bindParam(':taskid', $taskid, PDO::PARAM_INT);
+//            $query->execute();
+//
+//            $rowCount = $query->rowCount();
+//
+//            if ($rowCount === 0){
+//                $errorResponse = ResponseGenerator::newErrorResponse(404, "No task with that id.");
+//                $errorResponse->send();
+//                exit;
+//            }
+//
+//            while($row = $query->fetch(PDO::FETCH_ASSOC)) {
+//               $task = new Task($row['id'], $row['title'], $row['description'], $row['deadline'], $row['completed']);
+//               $taskArray[] = $task->returnTaskAsArray();
+//            }
+//
+//            $returnData = array();
+//            $returnData['rows_returned'] = $rowCount;
+//            $returnData['tasks'] = $taskArray;
+//
+//            $successResponse = ResponseGenerator::newSuccessResponse(200, "", true);
+//            $successResponse->setData($returnData);
+//            $successResponse->send();
+//
+//        } catch (PDOException $ex) {
+//            $errorResponse = ResponseGenerator::newErrorResponse(500, "Error: ".$ex->getMessage());
+//            $errorResponse->send();
+//            exit;
+//
+//        } catch (TaskException $ex) {
+//            $errorResponse = ResponseGenerator::newErrorResponse(500, "Error: ".$ex->getMessage());
+//            $errorResponse->send();
+//            exit;
+//        }
+//    }
+//    elseif($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+//        try {
+//            $query = $writeDB->prepare('DELETE FROM tbltasks WHERE id = :taskid');
+//            $query->bindParam(':taskid', $taskid, PDO::PARAM_INT);
+//            $query->execute();
+//
+//            $rowCount = $query->rowCount();
+//
+//            if($rowCount === 0){
+//                $response = new Response();
+//                $response->setHttpStatusCode(404);
+//                $response->setSuccess(false);
+//                $response->addMessage("Task not found.");
+//                $response->send();
+//                exit;
+//            }
+//            else {
+//                $response = new Response();
+//                $response->setHttpStatusCode(200);
+//                $response->setSuccess(true);
+//                $response->addMessage("Task deleted.");
+//                $response->send();
+//                exit;
+//            }
+//        }
+//        catch (PDOException $ex) {
+//            $response = new Response();
+//            $response->setHttpStatusCode(500);
+//            $response->setSuccess(false);
+//            $response->addMessage("Error: ".$ex->getMessage());
+//            $response->addMessage($ex);
+//            $response->send();
+//            exit;
+//
+//        }
+//            catch (TaskException $ex) {
+//            $response = new Response();
+//            $response->setHttpStatusCode(500);
+//            $response->setSuccess(false);
+//            $response->addMessage("Error: ".$ex->getMessage());
+//            $response->addMessage($ex);
+//            $response->send();
+//            exit;
+//        }
+//    }
+    elseif($_SERVER['REQUEST_METHOD'] === 'PATCH') {
 
         try {
 
-            $query = $readDB->prepare('SELECT id, title, description, DATE_FORMAT(deadline, "%d/%m/%Y %H:%i") as deadline, completed FROM tbltasks WHERE id = :taskid');
+            if($_SERVER['CONTENT_TYPE'] !== 'application/json'){
+                $errorResponse = ResponseGenerator::newErrorResponse(400, "Content-type header not set to JSON");
+                $errorResponse->send();
+                exit;
+            }
+            $rawPatchData = file_get_contents('php://input');
+            $jsonData = json_decode($rawPatchData);
+
+            if(!$jsonData){
+                $errorResponse = ResponseGenerator::newErrorResponse(400, "Request body is not valid JSON");
+                $errorResponse->send();
+                exit;
+            }
+
+            $title_updated = false;
+            $description_updated = false;
+            $deadline_updated = false;
+            $completed_updated = false;
+
+            $update_query = "";
+            $value_connector = "";
+
+            if(isset($jsonData->title)){
+                $title_updated = true;
+                $update_query .= "$value_connector title = :title";
+                $value_connector = ",";
+            }
+            if(isset($jsonData->description)){
+                $description_updated = true;
+                $update_query .= "$value_connector description = :description";
+                $value_connector = ",";
+            }
+            if(isset($jsonData->deadline)){
+                $deadline_updated_updated = true;
+                $update_query .= "$value_connector deadline = :deadline";
+                $value_connector = ",";
+            }
+            if(isset($jsonData->completed)){
+                $completed_updated = true;
+                $update_query .= "$value_connector completed = :completed";
+                $value_connector = ",";
+            }
+
+            if (!$title_updated && !$description_updated && $deadline_updated && !$completed_updated){
+                $errorResponse = ResponseGenerator::newErrorResponse(400, "No updates provided.");
+                $errorResponse->send();
+                exit;
+            }
+
+            $query = $readDB->prepare('SELECT id, title, description, deadline, completed FROM tbltasks WHERE id = :taskid');
             $query->bindParam(':taskid', $taskid, PDO::PARAM_INT);
             $query->execute();
 
@@ -39,9 +177,81 @@ if(array_key_exists("taskid", $_GET)){
                 exit;
             }
 
-            while($row = $query->fetch(PDO::FETCH_ASSOC)) {
-               $task = new Task($row['id'], $row['title'], $row['description'], $row['deadline'], $row['completed']);
-               $taskArray[] = $task->returnTaskAsArray();
+            $rowCount = $query->rowCount();
+
+//            if($rowCount === 0){
+//                $errorResponse = ResponseGenerator::newErrorResponse(404, "Task record not found.");
+//                $errorResponse->send();
+//                exit;
+//            }
+//
+//            while($row = $query->fetch(PDO::FETCH_ASSOC)) {
+//                $task = new Task($row['id'], $row['title'], $row['description'], $row['deadline'], $row['completed']);
+//                $taskArray[] = $task->returnTaskAsArray();
+//            }
+
+//            $s_query = $writeDB->prepare("SELECT id, title, deadline, completed FROM tbltasks WHERE id = :taskid");
+//            $s_query->bindParam(':taskid', $taskid, PDO::PARAM_INT);
+//            $s_query->execute();
+//
+//            $rowCount = $s_query->rowCount();
+//
+            if($rowCount === 0){
+                $errorResponse = ResponseGenerator::newErrorResponse(404, "Task record not found.");
+                $errorResponse->send();
+                exit;
+            }
+
+            while($row = $query->fetch(PDO::FETCH_ASSOC)){
+                $task = new Task($row['id'], $row['title'], $row['deadline'], $row['completed']);
+            }
+
+            $u_query = $writeDB->prepare("UPDATE tbltasks SET $update_query WHERE id = :taskID");
+
+            if ($title_updated) {
+                $task->setTitle($jsonData->title);
+                $u_query->bindParam(':title', $task->getTitle(), PDO::PARAM_STR);
+            }
+            if ($description_updated) {
+                $task->setDescription($jsonData->description);
+                $u_query->bindParam(':description', $task->getDescription(), PDO::PARAM_STR);
+            }
+            if ($deadline_updated) {
+                $task->setDeadline($jsonData->deadline);
+                $u_query->bindParam(':deadline', $task->deadline(), PDO::PARAM_STR);
+            }
+            if ($completed_updated) {
+                $task->setCompletedStatus($jsonData->completed);
+                $u_query->bindParam(':completed', $task->getCompletedStatus(), PDO::PARAM_STR);
+            }
+
+            $u_query->bindParam(':taskid', $taskid, PDO::PARAM_INT);
+            $u_query->execute();
+
+            $rowCount = $u_query->rowCount();
+
+            if($rowCount === 0){
+                $errorResponse = ResponseGenerator::newErrorResponse(400, "Error: ".$ex->getMessage());
+                $errorResponse->send();
+                exit;
+            }
+
+            $rs_query = $writeDB->prepare("SELECT id, title, deadline, completed FROM tbltasks WHERE id = :taskid");
+            $rs_query->bindParam(':taskid', $taskid, PDO::PARAM_INT);
+            $rs_query.execute();
+
+            $rowCount = $rs_query->rowCount();
+
+            if($rowCount === 0){
+                $errorResponse = ResponseGenerator::newErrorResponse(404, "Failed to retrieve the updated record.");
+                $errorResponse->send();
+                exit;
+            }
+
+            $taskArray = array();
+            while($row = $s_query->fetch(PDO::FETCH_ASSOC)){
+                $task = new Task($row['id'], $row['title'], $row['deadline'], $row['completed']);
+                $taskArray[] = $task->returnTaskAsArray();
             }
 
             $returnData = array();
@@ -52,64 +262,18 @@ if(array_key_exists("taskid", $_GET)){
             $successResponse->setData($returnData);
             $successResponse->send();
 
-        } catch (PDOException $ex) {
-            $errorResponse = ResponseGenerator::newErrorResponse(500, "Error: ".$ex->getMessage());
-            $errorResponse->send();
-            exit;
-
-        } catch (TaskException $ex) {
-            $errorResponse = ResponseGenerator::newErrorResponse(500, "Error: ".$ex->getMessage());
-            $errorResponse->send();
-            exit;
-        }
-    }
-    elseif($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-        try {
-            $query = $writeDB->prepare('DELETE FROM tbltasks WHERE id = :taskid');
-            $query->bindParam(':taskid', $taskid, PDO::PARAM_INT);
-            $query->execute();
-
-            $rowCount = $query->rowCount();
-
-            if($rowCount === 0){
-                $response = new Response();
-                $response->setHttpStatusCode(404);
-                $response->setSuccess(false);
-                $response->addMessage("Task not found.");
-                $response->send();
-                exit;
-            }
-            else {
-                $response = new Response();
-                $response->setHttpStatusCode(200);
-                $response->setSuccess(true);
-                $response->addMessage("Task deleted.");
-                $response->send();
-                exit;
-            }
         }
         catch (PDOException $ex) {
-            $response = new Response();
-            $response->setHttpStatusCode(500);
-            $response->setSuccess(false);
-            $response->addMessage("Error: ".$ex->getMessage());
-            $response->addMessage($ex);
-            $response->send();
-            exit;
+            error_log("Database query error - ".$ex, 0);
+            $errorResponse = ResponseGenerator::newErrorResponse(500, "Failed to update task -- check your data for errors.");
+            $errorResponse->send();
+        exit;
 
-        }
-            catch (TaskException $ex) {
-            $response = new Response();
-            $response->setHttpStatusCode(500);
-            $response->setSuccess(false);
-            $response->addMessage("Error: ".$ex->getMessage());
-            $response->addMessage($ex);
-            $response->send();
+        } catch (TaskException $ex) {
+            $errorResponse = ResponseGenerator::newErrorResponse(400, "Error: ".$ex->getMessage());
+            $errorResponse->send();
             exit;
         }
-    }
-    elseif($_SERVER['REQUEST_METHOD'] === 'PATCH') {
-
     }
     else {
         $errorResponse = ResponseGenerator::newErrorResponse(405, "Unsupported HTTP method requested");
