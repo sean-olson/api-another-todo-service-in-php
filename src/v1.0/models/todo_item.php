@@ -37,12 +37,6 @@ class TodoItem {
         $validation->concatenateValidation($this->setItemDueDate($todo_item_due_date));
         $validation->concatenateValidation($this->setItemCompletionStatus($todo_item_is_completed));
 
-//        $id_validation = $this->setItemId($todo_item_id);
-//        $name_validation = $this->setItemName($todo_item_name);
-//        $description_validation = $this->setItemDescription($todo_item_description);
-//        $date_validation = $this->setItemDueDate($todo_item_due_date);
-//        $status_validation = $this->setItemCompletionStatus($todo_item_is_completed);
-
         $this->_is_valid = $validation->getValidationStatus();
         $this->_error_messages = $validation->getErrorMessages();
 
