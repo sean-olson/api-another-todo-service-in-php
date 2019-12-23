@@ -62,11 +62,19 @@ class Task {
         return $this->_deadline;
     }
     public function setDeadline($deadline) {
-        if($deadline === null) {
-            $this->_deadline = null;
-            return;
+
+//        $parsed_date = new DateTime($deadline);
+////        $this->_deadline = date_format(new DateTime($deadline), 'Y-m-d H:i:s');
+//        $this->_deadline = $deadline;
+
+        // make sure the value is null OR if not null validate date and time passed in, must create date time ok and still match the same string passed (e.g. prevent 31/02/2018)
+        if(($deadline !== null) && !date_create_from_format('m/d/Y H:i', $deadline) || date_format(date_create_from_format('m/d/Y H:i', $deadline), 'm/d/Y H:i') != $deadline) {
+            throw new TaskException("Task deadline date and time error");
         }
-        $this->_deadline = date_format(new DateTime($deadline), 'Y-m-d H:i:s');
+
+
+//        $this->_deadline = DateTime::createFromFormat('d/m/Y H:s', $deadline);
+        $this->_deadline = $deadline;
     }
     public function setShortDeadline() {
         if($this->_deadline === null) {

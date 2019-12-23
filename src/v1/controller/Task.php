@@ -416,7 +416,7 @@ elseif (empty($_GET)) {
 
         try {
 
-            $query = $readDB->prepare('SELECT id, title, description, DATE_FORMAT(deadline, "%d/%m/%Y %H:%i") as deadline, completed FROM tbltasks');
+            $query = $readDB->prepare('SELECT id, title, description, DATE_FORMAT(deadline, "%m/%d/%Y %H:%i") as deadline, completed FROM tbltasks');
             $query->execute();
 
             $rowCount = $query->rowCount();
