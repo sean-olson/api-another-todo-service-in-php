@@ -85,7 +85,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     exit();
 }
 elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $response_data = array("method"=>"POST");
+
+    if($_SERVER['CONTENT_TYPE'] !== 'application/json') {
+        $errors = array('Content-type header needs to be application/json');
+        ApiResponse::generateErrorResponse(400, $errors);
+        exit();
+    }
+
+    $postInput = json_decode(file_get_contents('php://input'));
+    $item = new TodoItem(null, $postInput->name, $postInput->description, $postInput->due_date, $postInput->completed);
+
+    if(!$item->isValid()){
+        ApiResponse::generateErrorResponse(400, $item->getErrorMessages());
+        exit();
+    }
+
+    $id = DB::createTodoItem($item);
+
+    if(!is_numeric($id)){
+        $errors = array('Unable to save new Todo Item');
+        ApiResponse::generateErrorResponse(500, $errors);
+        exit();
+    }
+
+    $todo_item = DB::getTodoItem($id);
+    if(empty($todo_item)){
+        $errors = array('Unable to retrieve new Todo Item');
+        ApiResponse::generateErrorResponse(500, $errors);
+        exit();
+    }
+
+    $response_data['item_count'] = 1;
+    $response_data['results'] = $todo_item;
     ApiResponse::generateSuccessResponse(200, $response_data, 0);
     exit();
 }

@@ -139,21 +139,35 @@ class TodoItem {
     public function setItemDueDate($due_date) {
 
         $validation = new Validation();
-        
-        if(DateTime::createFromFormat ( 'm/d/Y H:s' , $due_date )){
+        try {
+            if ($due_date == null) {
+                $this->_todo_item_due_date = null;
+            } elseif (DateTime::createFromFormat('m/d/Y H:s', $due_date)) {
+                $this->_todo_item_due_date = date_format(DateTime::createFromFormat('m/d/Y H:s', $due_date), 'Y-m-d H:i:s');
+                $validation->setValidationStatus(true);
+            } else {
+                $validation->setValidationStatus(true);
+                $this->_todo_item_due_date = $due_date;
+            }
+        }
+        catch (Exception $ex){
             $validation->setValidationStatus(false);
-            $validation->setErrorMessage('Due Date Error: Invalid date format.');
-        } 
-        else{
-            $validation->setValidationStatus(true);
-            $this->_todo_item_due_date = $due_date;
+            $validation->setErrorMessage("SET DATE ERROR".$ex);
         }
         return $validation;
     }
 
+    /**
+     * Getter returns a formatted due date in the form m/d/y if set, otherwise returns null
+     * @return string|null
+     */
     public function getFormattedItemDueDate(){
-        return date_format(DateTime::createFromFormat('Y-m-d H:i:s', $this->getItemDueDate()) , 'm/d/Y');
-//        return $this->_todo_item_due_date;
+        if($this->_todo_item_due_date === null){
+            return null;
+        }
+        else {
+            return date_format(DateTime::createFromFormat('Y-m-d H:i:s', $this->getItemDueDate()) , 'm/d/Y');
+        }
     }
 
     /**

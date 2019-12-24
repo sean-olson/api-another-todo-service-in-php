@@ -36,8 +36,8 @@ class DB {
             return $row['todo_item_count'];
         }
         catch(PDOException $ex) {
-            error_log("DB CONNECTION ERROR: $ex");
-            $error_messages = Array('Unable to connect to database.');
+            error_log("DB CRUD ERROR: $ex");
+            $error_messages = Array('Database error.');
             ApiResponse::generateErrorResponse(500, $error_messages);
             exit();
         }
@@ -62,8 +62,8 @@ class DB {
             return $todo_item->toArray();
         }
             catch(PDOException $ex) {
-            error_log("DB CONNECTION ERROR: $ex");
-            $error_messages = Array('Unable to connect to database.');
+            error_log("DB CRUD ERROR: $ex");
+            $error_messages = Array('Database error.');
             ApiResponse::generateErrorResponse(500, $error_messages);
             exit();
         }
@@ -88,8 +88,8 @@ class DB {
             return $todo_items;
         }
         catch(PDOException $ex) {
-            error_log("DB CONNECTION ERROR: $ex");
-            $error_messages = Array('Unable to connect to database.');
+            error_log("DB CRUD ERROR: $ex");
+            $error_messages = Array('Database error.');
             ApiResponse::generateErrorResponse(500, $error_messages);
             exit();
         }
@@ -115,8 +115,8 @@ class DB {
             return $todo_items;
         }
         catch(PDOException $ex) {
-            error_log("DB CONNECTION ERROR: $ex");
-            $error_messages = Array('Unable to connect to database.');
+            error_log("DB CRUD ERROR: $ex");
+            $error_messages = Array('Database error.');
             ApiResponse::generateErrorResponse(500, $error_messages);
             exit();
         }
@@ -143,13 +143,40 @@ class DB {
             return $todo_items;
         }
         catch(PDOException $ex) {
-            error_log("DB CONNECTION ERROR: $ex");
-            $error_messages = Array('Unable to connect to database.'.$ex);
+            error_log("DB CRUD ERROR: $ex");
+            $error_messages = Array('Database error.');
             ApiResponse::generateErrorResponse(500, $error_messages);
             exit();
         }
     }
-    public static function createTodoItem($item){}
+    public static function createTodoItem($item){
+        try{
+
+            $dbConn = self::getDbConnection();
+
+            $name = $item->getItemName();
+            $description = $item->getItemDescription();
+            $due_date = $item->getItemDueDate();
+            $completed = $item->getItemCompletionStatus();
+
+            $query = $dbConn->prepare('INSERT INTO tbl_todo_items (todo_item_name, todo_item_description, todo_item_due_date, todo_item_is_completed) VALUES (:name, :description, :due_date, :completed)');
+            $query->bindParam(':name', $name, PDO::PARAM_STR);
+            $query->bindParam(':description', $description, PDO::PARAM_STR);
+            $query->bindParam(':due_date', $due_date, PDO::PARAM_STR);
+            $query->bindParam(':completed', $completed, PDO::PARAM_STR);
+            $query->execute();
+
+            return $dbConn->lastInsertId();
+        }
+        catch(PDOException $ex) {
+            error_log("DB CRUD ERROR: $ex");
+            $error_messages = Array('Database error.');
+            ApiResponse::generateErrorResponse(500, $error_messages);
+            exit();
+        }
+
+
+    }
     public static function updateTodoItem($item){}
     public static function deleteTodoItem($id){}
 }
