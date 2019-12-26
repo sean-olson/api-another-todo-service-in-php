@@ -1,10 +1,9 @@
-RewriteEngine On    # Turn on the rewriting engine
+RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 
-# Tasks
-RewriteRule    ^tasks/([0-9]+)$          controller/task.php?taskid=$1    [L]    # Handle task id requests
-RewriteRule    ^tasks/complete$          controller/task.php?completed=Y     [L]    # Handle task get complete status requests
-RewriteRule    ^tasks/incomplete$        controller/task.php?completed=N    [L]    # Handle task get incomplete status requests
-RewriteRule    ^tasks/page/([0-9]+)$     controller/task.php?page=$1    [L]    # Handle page requests
-RewriteRule    ^tasks$                   controller/task.php     [L]    # Handle task requests
+RewriteRule ^todo/complete$ controllers/todo_controller.php?completed=Y [L]
+RewriteRule ^todo/incomplete$ controllers/todo_controller.php?completed=N [L]
+RewriteRule ^todo/([0-9]+)$ controllers/todo_controller.php?id=$1 [L]
+RewriteRule ^todo/page/([0-9]+)$ controllers/todo_controller.php?page=$1 [L]
+RewriteRule ^todo$ controllers/todo_controller.php [L]
