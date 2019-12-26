@@ -1,5 +1,8 @@
 <?php
 
+require_once ('response_controller.php');
+require_once ('../models/validation.php');
+
 class DB {
     private static $DBConnection;
     private static $SELECT_LIST = ' todo_item_id AS id, todo_item_name AS name, todo_item_description AS description, todo_item_due_date AS due_date, todo_item_is_completed AS completed ';
@@ -28,9 +31,7 @@ class DB {
     public static function getTodoItemCount() {
         try {
             $dbConn = self::getDbConnection();
-            $is_deleted = 0;
-            $query = $dbConn->prepare('SELECT COUNT(todo_item_id) AS todo_item_count FROM tbl_todo_items WHERE todo_is_deleted = :is_deleted');
-            $query->bindParam(':is_deleted', $is_deleted, PDO::PARAM_INT);
+            $query = $dbConn->prepare('SELECT COUNT(todo_item_id) AS todo_item_count FROM vw_todo_items');
             $query->execute();
             $row = $query->fetch(PDO::FETCH_ASSOC);
             return $row['todo_item_count'];
@@ -55,11 +56,7 @@ class DB {
             if ($query->rowCount() === 0) {
                 return null;
             }
-            $todo_item = self::instanceTodoObject($query->fetch(PDO::FETCH_ASSOC));
-            if (!$todo_item->isValid()) {
-                return array("errors" => $todo_item->getErrorMessages());
-            }
-            return $todo_item->toArray();
+            return  self::instanceTodoObject($query->fetch(PDO::FETCH_ASSOC));
         }
             catch(PDOException $ex) {
             error_log("DB CRUD ERROR: $ex");
@@ -72,9 +69,7 @@ class DB {
     public static function getAllTodoItems(){
         try {
             $dbConn = self::getDbConnection();
-            $is_deleted = 0;
-            $query = $dbConn->prepare('SELECT ' . self::$SELECT_LIST . ' FROM tbl_todo_items WHERE todo_is_deleted = :is_deleted');
-            $query->bindParam(':is_deleted', $is_deleted, PDO::PARAM_INT);
+            $query = $dbConn->prepare('SELECT ' . self::$SELECT_LIST . ' FROM vw_todo_items');
             $query->execute();
 
             $todo_items = array();
@@ -125,9 +120,7 @@ class DB {
     public static function getPagedTodoItems($skip, $take){
         try{
             $dbConn = self::getDbConnection();
-            $is_deleted = 0;
-            $query = $dbConn->prepare('SELECT ' . self::$SELECT_LIST . ' FROM tbl_todo_items WHERE todo_is_deleted = :is_deleted LIMIT :take OFFSET :skip');
-            $query->bindParam(':is_deleted', $is_deleted, PDO::PARAM_INT);
+            $query = $dbConn->prepare('SELECT ' . self::$SELECT_LIST . ' FROM vw_todo_items LIMIT :take OFFSET :skip');
             $query->bindParam(':skip', $skip, PDO::PARAM_INT);
             $query->bindParam(':take', $take, PDO::PARAM_INT);
             $query->execute();
@@ -149,11 +142,11 @@ class DB {
             exit();
         }
     }
+
     public static function createTodoItem($item){
         try{
 
             $dbConn = self::getDbConnection();
-
             $name = $item->getItemName();
             $description = $item->getItemDescription();
             $due_date = $item->getItemDueDate();
@@ -174,9 +167,50 @@ class DB {
             ApiResponse::generateErrorResponse(500, $error_messages);
             exit();
         }
-
-
     }
-    public static function updateTodoItem($item){}
-    public static function deleteTodoItem($id){}
+
+    public static function updateTodoItem($item) {
+        try{
+            $id = $item->getItemId();
+            $name = $item->getItemName();
+            $description = $item->getItemDescription();
+            $due_date = $item->getItemDueDate();
+            $completed = $item->getItemCompletionStatus();
+
+            $dbConn = self::getDbConnection();
+            $query = $dbConn->prepare('UPDATE tbl_todo_items SET todo_item_name = :name, todo_item_description = :description, todo_item_due_date = :due_date, todo_item_is_completed = :completed  WHERE todo_item_id = :id');
+//            $query = $dbConn->prepare('UPDATE tbl_todo_items SET todo_item_name = "test puts " WHERE todo_item_id = :id');
+            $query->bindParam(':id', $id, PDO::PARAM_INT);
+            $query->bindParam(':name', $name, PDO::PARAM_STR);
+            $query->bindParam(':description', $description, PDO::PARAM_STR);
+            $query->bindParam(':due_date', $due_date, PDO::PARAM_STR);
+            $query->bindParam(':completed', $completed, PDO::PARAM_STR);
+            $query->execute();
+            return;
+        }
+        catch(PDOException $ex) {
+            error_log("DB CRUD ERROR: $ex");
+            $error_messages = Array('Database error.'.$ex);
+            ApiResponse::generateErrorResponse(500, $error_messages);
+            exit();
+        }
+    }
+
+    public static function deleteTodoItem($id){
+        try{
+
+            $dbConn = self::getDbConnection();
+            $query = $dbConn->prepare('UPDATE tbl_todo_items SET todo_is_deleted = 1 WHERE todo_item_id = :id');
+            $query->bindParam(':id', $id, PDO::PARAM_INT);
+            $query->execute();
+            return ($query->rowCount() === 1);
+
+        }
+        catch(PDOException $ex) {
+            error_log("DB CRUD ERROR: $ex");
+            $error_messages = Array('Database error.');
+            ApiResponse::generateErrorResponse(500, $error_messages);
+            exit();
+        }
+    }
 }

@@ -231,8 +231,8 @@ class TodoItem {
         $todoItem['id'] = $this->getItemId();
         $todoItem['name'] = $this->getItemName();
         $todoItem['description'] = $this->getItemDescription();
-        $todoItem['dueDate'] = $this->getFormattedItemDueDate();
-        $todoItem['isCompleted'] = $this->getItemCompletionStatus();
+        $todoItem['due_date'] = $this->getFormattedItemDueDate();
+        $todoItem['is_completed'] = $this->getItemCompletionStatus();
         return $todoItem;
     }
 }
