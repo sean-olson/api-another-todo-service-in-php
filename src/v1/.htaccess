@@ -1,12 +1,10 @@
-php_flag display_errors on
-
-RewriteEngine On
+RewriteEngine On    # Turn on the rewriting engine
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 
-
-RewriteRule ^tasks/([0-9]+)$ controller/task.php?taskid=$1 [L]
-RewriteRule ^tasks/complete$ controller/task.php?completed=Y [L]
-RewriteRule ^tasks/incomplete$ controller/task.php?completed=N [L]
-RewriteRule ^tasks/page/([0-9]+)$ controller/task.php?page=$1 [L]
-RewriteRule ^tasks$ controller/task.php [L]
+# Tasks
+RewriteRule    ^tasks/([0-9]+)$          controller/task.php?taskid=$1    [L]    # Handle task id requests
+RewriteRule    ^tasks/complete$          controller/task.php?completed=Y     [L]    # Handle task get complete status requests
+RewriteRule    ^tasks/incomplete$        controller/task.php?completed=N    [L]    # Handle task get incomplete status requests
+RewriteRule    ^tasks/page/([0-9]+)$     controller/task.php?page=$1    [L]    # Handle page requests
+RewriteRule    ^tasks$                   controller/task.php     [L]    # Handle task requests

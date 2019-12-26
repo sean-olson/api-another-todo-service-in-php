@@ -1,26 +1,32 @@
 <?php
 
 class DB {
-    private static $writeDBConnection;
-    private static $readDBConnection;
+	// Static Class DB Connection Variables (for write and read)
+	private static $writeDBConnection;
+	private static $readDBConnection;
 
-    public static function connectWriteDB(){
-    if (self::$writeDBConnection === null) {
-        self::$writeDBConnection = new PDO('mysql:host=localhost;dbname=tasksdb;utf-8', 'root', '');
-        self::$writeDBConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        self::$writeDBConnection->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-    }
+	// Static Class Method to connect to DB to perform Writes actions
+	// handle the PDOException in the controller class to output a json api error
+	public static function connectWriteDB() {
+		if(self::$writeDBConnection === null) {
+				self::$writeDBConnection = new PDO('mysql:host=localhost;dbname=tasksdb;charset=utf8', 'root', 'root');
+				self::$writeDBConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+				self::$writeDBConnection->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+		}
 
-    return self::$writeDBConnection;
-    }
+		return self::$writeDBConnection;
+	}
 
-    public static function connectReadDB(){
-        if (self::$readDBConnection === null) {
-            self::$readDBConnection = new PDO('mysql:host=localhost;dbname=tasksdb;utf-8', 'root', '');
-            self::$readDBConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            self::$readDBConnection->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-        }
+	// Static Class Method to connect to DB to perform read only actions (read replicas)
+	// handle the PDOException in the controller class to output a json api error
+	public static function connectReadDB() {
+		if(self::$readDBConnection === null) {
+				self::$readDBConnection = new PDO('mysql:host=localhost;dbname=tasksdb;charset=utf8', 'root', 'root');
+				self::$readDBConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+				self::$readDBConnection->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+		}
 
-        return self::$readDBConnection;
-    }
+		return self::$readDBConnection;
+	}
+
 }
