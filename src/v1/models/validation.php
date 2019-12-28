@@ -25,10 +25,6 @@ class Validation {
     public function getErrorMessages(){
         return $this->_validation_errors;
     }
-    public function appendErrorMessages($messages){
-        $this->_validation_errors = array_merge($this->getErrorMessages(), $messages);
-    }
-
     public function concatenateValidation($validation){
         if(!$validation->getValidationStatus()){
             $this->setValidationStatus(false);
@@ -41,7 +37,6 @@ class Validation {
     public function __toString()
     {
         $valid_state = $this->_isValid ? 'is valid': 'is invalid';
-        $message = "The property is $valid_state";
-        return $message;
+        return "The resource $valid_state";
     }
 }

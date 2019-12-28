@@ -1,2 +1,0 @@
-USING A CREDENTIAL VAULT IN PHP
-https://www.codementor.io/ccornutt/keeping-credentials-secure-in-php-kvcbrk55z

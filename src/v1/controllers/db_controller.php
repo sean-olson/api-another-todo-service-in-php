@@ -26,7 +26,7 @@ class DB {
         }
         catch(PDOException $ex) {
                 error_log("DB CONNECTION ERROR: $ex");
-                $error_messages = Array('Unable to connect to database.'.$ex);
+                $error_messages = Array('Unable to connect to database.');
                 ApiResponse::generateErrorResponse(500, $error_messages);
                 exit();
         }
