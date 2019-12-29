@@ -74,7 +74,7 @@ providing a platform for a functional To-Do application.
 at 20 items. 
 
 ###### POST Method
-- **`/v1/todo`** : requires a to-do item in JSON format -- `name` and `is_completed` are required.
+- **`/v1/todo`** : requires a to-do item in JSON format, `name` and `is_completed` properties are required.
 
 ###### PUT Method
 - **`/v1/todo/:id`** : requires a to-do item in JSON format with updated fields only. 
