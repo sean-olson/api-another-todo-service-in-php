@@ -1,5 +1,5 @@
 # Yet Another ToDo API (YATA)
-A simple REST API to support a simple ToDo application -- the *Hello World* of frontend frameworks. The YATA API is written in PHP and depends on 
+A simple REST API to support a To-Do web application -- the *Hello World* of frontend frameworks. The YATA API is written in PHP and depends on 
 Apache and MySQL.
 
 ## Setting Up YATA:
