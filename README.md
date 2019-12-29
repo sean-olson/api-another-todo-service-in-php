@@ -1,19 +1,18 @@
 # Yet Another To-Do API (YATA)
-A simple REST API to support a To-Do web application -- the *Hello World* of frontend frameworks. The YATA API is written in PHP and depends on 
+A simple REST API to support a To-Do web application -- the *Hello World* of frontend frameworks. YATA is written in PHP and depends on 
 Apache and MySQL.
 
 ## Setting Up YATA:
 
 #### 1. Download the Project 
-Clone or download the GitHub repo to your computer.
+Clone or download the GitHub [repo](https://github.com/sean-olson/YetAnotherTodoAPI.git) to your computer.
 
 #### 2. Load the Code Files into Server Environment
 Implementations may differ significantly, but to get up and running quickly just copy the contents of the `/src` 
 folder into the `DocumentRoot` of your Apache Server, as configured in your instance (see the `httpd.conf` file).
 
 #### 3. Setup the Database
-The API depends on the MySQL database to function.  Setup is a simple 
-three-step process.
+The API depends on a MySQL database to function.  Setup is a simple three-step process.
 
 1. Create a database for your To-Do project, named *db_todo*. 
 
@@ -21,19 +20,19 @@ three-step process.
 each script in your installed instance of MySQL.  Make sure to execute the scripts in order.
 
     - `1_tbl_todo_items.sql` will create a database table, *tbl_todo_items* where the API stores the to-do items
-    - `2_vw_todo_items.sql` will create a database view, *vw_todo_ietms*  that provides a filtered view of the 
-     of the *tbl_todo_items* eliminating the deleted to-do items.  
+    - `2_vw_todo_items.sql` will create a database view, *vw_todo_ietms*  that provides a filtered view of 
+     *tbl_todo_items*, eliminating deleted to-do items.  
 
 3. Set the DB credentials in the `todo.ini` file.
 
-    Database connectivity and authentication requires the setting of three properties in the *todo.ini* file.
+    Database connectivity and authentication require setting three properties in the *todo.ini* file.
     ````
     db_name = 'db_todo'
     user_name =  'YOUR_USER_NAME_HERE'
     password = 'YOUR_PASSWORD_HERE'
    ````
   
-The file is located in the root of the project file.  For security reasons, it's expected that this file will 
+The file is located in the root of the project.  For security reasons, it's expected that this file will 
 sit in the same directory as Apache's `DocumentRoot` folder.  If the relative location of the `todo.ini` 
 changes in relationship to the code files, the relative path statement used to parse the file will need 
 to be updated. (see the `getDbConnection()` method in `src/v1/controllers/db_controller.php`)   
@@ -41,8 +40,8 @@ to be updated. (see the `getDbConnection()` method in `src/v1/controllers/db_con
 
 #### 4. Review the .htaccess File 
 The rewrite rules in the `.htaccess` file allow use of standard API route names in your application,
-rather than the *less-pretty* FQDN with query-string parameters.  If this seems too much, just know that's what the 
-`.htaccess` file does, and it needs to be inside the v1 folder, alongside the directories for `controllers` and `models`.
+rather than the *less-pretty* FQDN with query-string parameters.  The `.htaccess` file needs to be inside the v1 folder, 
+alongside the directories for `controllers` and `models`.
 
 #### 5. The `tbl_todo_items` Entity
 
