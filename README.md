@@ -1,4 +1,4 @@
-# Yet Another ToDo API (YATA)
+# Yet Another To-Do API (YATA)
 A simple REST API to support a To-Do web application -- the *Hello World* of frontend frameworks. The YATA API is written in PHP and depends on 
 Apache and MySQL.
 
@@ -9,20 +9,20 @@ Clone or download the GitHub repo to your computer.
 
 #### 2. Load the Code Files into Server Environment
 Implementations may differ significantly, but to get up and running quickly just copy the contents of the `/src` 
-folder into the `DocumentRoot`, as configured in your instance of Apache (see the `httpd.conf` file).
+folder into the `DocumentRoot` of your Apache Server, as configured in your instance (see the `httpd.conf` file).
 
 #### 3. Setup the Database
 The API depends on the MySQL database to function.  Setup is a simple 
 three-step process.
 
-1. Create a database for your ToDo project, named *db_todo*. 
+1. Create a database for your To-Do project, named *db_todo*. 
 
-2. Create the database table and view by running the two scripts in the `SQL/` directory of the project folder in your 
-MySQL SQL window.  Execute the scripts in order.
+2. Create the database table and view by running the two scripts in the `SQL/` directory of the project folder, running 
+each script in your installed instance of MySQL.  Make sure to execute the scripts in order.
 
-    - `1_tbl_todo_items.sql` will create a database table, *tbl_todo_items* where the API stores the ToDo items
+    - `1_tbl_todo_items.sql` will create a database table, *tbl_todo_items* where the API stores the to-do items
     - `2_vw_todo_items.sql` will create a database view, *vw_todo_ietms*  that provides a filtered view of the 
-     of the *tbl_todo_items* eliminating the deleted todo items.  
+     of the *tbl_todo_items* eliminating the deleted to-do items.  
 
 3. Set the DB credentials in the `todo.ini` file.
 
@@ -33,17 +33,16 @@ MySQL SQL window.  Execute the scripts in order.
     password = 'YOUR_PASSWORD_HERE'
    ````
   
-The file is located in the root of the project file.  For security, it's expected that this file will 
-sit in the same directory as Apache's root document folder.  If the relative location of the `todo.ini` 
+The file is located in the root of the project file.  For security reasons, it's expected that this file will 
+sit in the same directory as Apache's `DocumentRoot` folder.  If the relative location of the `todo.ini` 
 changes in relationship to the code files, the relative path statement used to parse the file will need 
 to be updated. (see the `getDbConnection()` method in `src/v1/controllers/db_controller.php`)   
 
 
 #### 4. Review the .htaccess File 
-The rewrite rules in the `.htaccess` file allow use of standard API routes in your application,
-rather than the *less-pretty* FQDN with query-string parameters.  If this is more than you want to deal 
-with, just know that's what the `.htaccess` file does, and it needs to be inside the v1 folder, alongside 
-the directories for `controllers` and `models`.
+The rewrite rules in the `.htaccess` file allow use of standard API route names in your application,
+rather than the *less-pretty* FQDN with query-string parameters.  If this seems too much, just know that's what the 
+`.htaccess` file does, and it needs to be inside the v1 folder, alongside the directories for `controllers` and `models`.
 
 #### 5. The `tbl_todo_items` Entity
 
@@ -56,9 +55,9 @@ the directories for `controllers` and `models`.
 
 ## Using YATA:
 YATA includes a set of routes that support full CRUD operations against the `tbl_todo_items` entity, 
-providing a platform for a functional ToDo application.
+providing a platform for a functional To-Do application.
 
-###### TODO Item Schema
+###### The To-Do Item Schema
     {
         "id":{"type":"integer"},
         "name":{"type":"string", "required":true, "maximum":255},
